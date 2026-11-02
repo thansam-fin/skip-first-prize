@@ -42,6 +42,7 @@ nav a:hover{color:var(--gold);border-color:var(--gold)}
 /* hero */
 header.hero{padding:44px 0 20px}
 .eyebrow{color:var(--gold);font-size:.85rem;letter-spacing:.08em;font-weight:500}
+.tagline{margin:10px 0 4px;display:inline-block;padding:8px 16px;border-radius:12px;border:1px solid var(--gold);background:rgba(245,185,66,.12);color:var(--gold);font-size:clamp(1.05rem,3.4vw,1.4rem);font-weight:700;line-height:1.4}
 h1{margin:6px 0 10px;font-size:clamp(1.6rem,4.6vw,2.4rem);line-height:1.25;font-weight:700}
 .lead{color:var(--muted);margin:0;max-width:62ch}
 
@@ -95,6 +96,23 @@ table.tbl{width:100%;min-width:640px;border-collapse:collapse;font-variant-numer
 .expect{position:absolute;left:0;right:0;border-top:1px dashed var(--red);pointer-events:none}
 .chart-note{color:var(--muted);font-size:.84rem;margin:12px 8px 0}
 
+/* affiliate carousel */
+.car{position:relative}
+.track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px;-webkit-overflow-scrolling:touch}
+.track::-webkit-scrollbar{display:none}
+.item{flex:0 0 min(280px,76%);scroll-snap-align:start;display:block;text-decoration:none;color:var(--text);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#120d22;transition:border-color .15s}
+.item:hover,.item:focus-visible{border-color:var(--gold)}
+.item img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#1f1736}
+.item .cap{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;font-size:.9rem}
+.item .go{color:var(--gold);white-space:nowrap}
+.car-btn{position:absolute;top:calc(50% - 36px);width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(13,10,24,.85);color:var(--text);font:inherit;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.car-btn:hover{border-color:var(--gold);color:var(--gold)}
+.car-btn.prev{left:-6px}.car-btn.next{right:-6px}
+.dots{display:flex;justify-content:center;gap:8px;margin:14px 0 4px}
+.dots button{width:9px;height:9px;padding:0;border-radius:50%;border:0;background:var(--line);cursor:pointer}
+.dots button[aria-current="true"]{background:var(--gold)}
+.disc{margin:10px 4px 0;color:var(--muted);font-size:.8rem;text-align:center}
+
 /* notes */
 .note{margin-top:44px;padding:16px 18px;border:1px solid var(--gold);border-radius:var(--radius);background:linear-gradient(135deg,rgba(245,185,66,.08),rgba(124,80,200,.08));font-size:.9rem;color:var(--muted)}
 .note strong.warn{color:var(--red)}
@@ -119,6 +137,7 @@ footer p{margin:4px 0}
 <div class="wrap">
 <header class="hero">
   <div class="eyebrow">สถิติเพื่อการศึกษา</div>
+  <p class="tagline">รางวัลที่ 1 ไม่ไหว ขอที่ 2 3 4 และ 5 จะได้ไหม</p>
   <h1>ความถี่เลข 0–9 รายหลัก<br>สลากกินแบ่งรัฐบาล รางวัลที่ 2 – 5</h1>
   <p class="lead">นับจำนวนครั้งที่เลข 0–9 ปรากฏในแต่ละหลัก (แสน หมื่น พัน ร้อย สิบ หน่วย) ของเลข 6 หลักทุกรางวัล <span id="range"></span></p>
   <div class="cards" id="cards"></div>
@@ -143,6 +162,19 @@ footer p{margin:4px 0}
   </div>
 </section>
 
+<section class="sec shop" id="shop" hidden>
+  <div class="sec-h"><h2>ของน่าซื้อ</h2><span class="sub">ลิงก์พันธมิตร Shopee Affiliate</span></div>
+  <div class="panel">
+    <div class="car">
+      <div class="track" id="track" tabindex="0" role="region" aria-label="รายการสินค้า เลื่อนซ้ายขวาเพื่อดูเพิ่ม"></div>
+      <button type="button" class="car-btn prev" id="car-prev" aria-label="ก่อนหน้า">‹</button>
+      <button type="button" class="car-btn next" id="car-next" aria-label="ถัดไป">›</button>
+    </div>
+    <div class="dots" id="dots"></div>
+    <p class="disc">ลิงก์พันธมิตร (Shopee Affiliate): หากคุณซื้อผ่านลิงก์ในส่วนนี้ เว็บไซต์อาจได้รับค่าคอมมิชชัน โดยราคาที่คุณจ่ายไม่เปลี่ยนแปลง</p>
+  </div>
+</section>
+
 <div class="note">
   <strong class="warn">ข้อควรทราบสำคัญ:</strong> สลากกินแบ่งรัฐบาลเป็นการสุ่มอิสระในแต่ละงวด ตัวเลขที่ออกบ่อยหรือไม่บ่อยในอดีต<u>ไม่ได้เพิ่มหรือลดโอกาส</u>ที่จะออกในงวดถัดไป
   ความต่างของความถี่ในตารางเป็นความผันผวนตามธรรมชาติของการสุ่ม (ยิ่งมีเลขมาก ยิ่งใกล้ค่าคาดหมายของแต่ละหลัก) หน้านี้จัดทำเพื่อการศึกษาและความบันเทิงเท่านั้น ไม่ใช่คำแนะนำการซื้อสลาก
@@ -158,6 +190,10 @@ footer p{margin:4px 0}
 <script>
 const DATA = {"SECOND": {"draws": 474, "numbers": 2370, "positions": {"แสน": [237, 248, 253, 257, 248, 211, 214, 231, 249, 222], "หมื่น": [242, 232, 261, 240, 244, 232, 226, 264, 208, 221], "พัน": [255, 234, 252, 233, 245, 207, 241, 237, 228, 238], "ร้อย": [241, 240, 245, 226, 227, 238, 218, 250, 246, 239], "สิบ": [260, 253, 237, 228, 231, 216, 212, 254, 235, 244], "หน่วย": [238, 227, 252, 224, 220, 244, 261, 237, 246, 221]}}, "THIRD": {"draws": 474, "numbers": 4740, "positions": {"แสน": [495, 495, 472, 497, 417, 494, 446, 480, 470, 474], "หมื่น": [481, 449, 474, 483, 489, 495, 461, 450, 488, 470], "พัน": [456, 500, 451, 488, 469, 483, 502, 467, 466, 458], "ร้อย": [466, 445, 468, 482, 473, 488, 494, 476, 484, 464], "สิบ": [467, 456, 510, 428, 469, 538, 467, 471, 475, 459], "หน่วย": [474, 494, 461, 492, 511, 451, 464, 447, 465, 481]}}, "FOURTH": {"draws": 474, "numbers": 23700, "positions": {"แสน": [2375, 2393, 2422, 2391, 2422, 2313, 2330, 2350, 2367, 2337], "หมื่น": [2375, 2376, 2360, 2414, 2330, 2323, 2407, 2314, 2418, 2383], "พัน": [2389, 2392, 2419, 2371, 2306, 2353, 2422, 2360, 2335, 2353], "ร้อย": [2430, 2342, 2435, 2357, 2347, 2349, 2306, 2369, 2378, 2387], "สิบ": [2421, 2405, 2392, 2383, 2337, 2316, 2367, 2370, 2308, 2401], "หน่วย": [2339, 2417, 2363, 2329, 2398, 2364, 2383, 2308, 2353, 2446]}}, "FIFTH": {"draws": 474, "numbers": 47400, "positions": {"แสน": [4698, 4737, 4846, 4721, 4840, 4617, 4678, 4739, 4757, 4767], "หมื่น": [4764, 4765, 4857, 4692, 4703, 4809, 4861, 4671, 4663, 4615], "พัน": [4748, 4678, 4713, 4780, 4621, 4688, 4901, 4712, 4741, 4818], "ร้อย": [4756, 4728, 4680, 4771, 4828, 4688, 4746, 4586, 4846, 4771], "สิบ": [4827, 4668, 4639, 4802, 4701, 4731, 4848, 4766, 4833, 4585], "หน่วย": [4826, 4717, 4800, 4667, 4663, 4787, 4768, 4643, 4703, 4826]}}};
 const META = {"draws": 474, "range": "งวด 30 ธ.ค. 2549 ถึง 1 พ.ย. 2569"};
+
+// รายการสินค้า Shopee Affiliate: ใส่ได้หลายชิ้น ถ้าเว้นว่าง [] ส่วนนี้จะซ่อนไปเอง
+// รูปแบบ: {title:"ชื่อสินค้า", img:"images/ชื่อไฟล์.jpg", url:"https://s.shopee.co.th/..."}
+const AFFILIATE = [];
 
 const PRIZES = [
   {key:"SECOND", id:"r2", name:"รางวัลที่ 2", per:5},
@@ -246,7 +282,44 @@ function setMode(m){
 }
 document.getElementById("m-count").onclick = ()=>setMode("count");
 document.getElementById("m-pct").onclick = ()=>setMode("pct");
+
+function renderShop(){
+  const items = AFFILIATE.filter(a => a && typeof a.url==="string" && a.url.startsWith("https://") && a.img);
+  if(!items.length) return;
+  const sec = document.getElementById("shop"), track = document.getElementById("track"), dots = document.getElementById("dots");
+  items.forEach((a,i)=>{
+    const link = document.createElement("a");
+    link.className = "item"; link.href = a.url; link.target = "_blank";
+    link.rel = "sponsored nofollow noopener noreferrer";
+    const img = document.createElement("img");
+    img.src = a.img; img.alt = a.title || "สินค้า"; img.loading = "lazy";
+    link.appendChild(img);
+    const cap = document.createElement("div"); cap.className = "cap";
+    const t = document.createElement("span"); t.textContent = a.title || "";
+    const go = document.createElement("span"); go.className = "go"; go.textContent = "ดูที่ Shopee →";
+    cap.append(t, go); link.appendChild(cap);
+    track.appendChild(link);
+    const dot = document.createElement("button");
+    dot.type = "button"; dot.setAttribute("aria-label","สินค้าที่ "+(i+1));
+    dot.onclick = ()=>step(i - current());
+    dots.appendChild(dot);
+  });
+  const w = ()=>{const it=track.querySelector(".item"); return it.getBoundingClientRect().width + 12;};
+  const current = ()=>{
+    if(track.scrollLeft + track.clientWidth >= track.scrollWidth - 2) return items.length-1;
+    return Math.min(items.length-1, Math.max(0, Math.round(track.scrollLeft / w())));
+  };
+  const mark = ()=>{const c=current(); [...dots.children].forEach((d,i)=>d.setAttribute("aria-current", i===c));};
+  const step = n => track.scrollBy({left:n*w(), behavior:"smooth"});
+  document.getElementById("car-prev").onclick = ()=>step(-1);
+  document.getElementById("car-next").onclick = ()=>step(1);
+  track.addEventListener("scroll", mark, {passive:true});
+  window.addEventListener("resize", mark);
+  sec.hidden = false; mark();
+}
+
 render();
+renderShop();
 </script>
 </body>
 </html>
