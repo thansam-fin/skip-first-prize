@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สถิติสลากกินแบ่งรัฐบาล รางวัลที่ 2–5</title>
+<meta name="description" content="ความถี่เลข 0–9 รายหลักของสลากกินแบ่งรัฐบาล รางวัลที่ 2, 3, 4, 5 และรวมทุกรางวัล เพื่อการศึกษา">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0a18;
+  --bg2:#17102b;
+  --card:#181228;
+  --line:#3b2f5e;
+  --text:#ece8f6;
+  --muted:#a89fc4;
+  --gold:#f5b942;
+  --blue:#7cc4ff;
+  --red:#ff5d73;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{
+  margin:0;color:var(--text);background:var(--bg);
+  background-image:radial-gradient(1200px 600px at 15% -10%,#2a1b52 0,transparent 60%),
+                   radial-gradient(900px 500px at 100% 10%,#1d2250 0,transparent 55%);
+  background-attachment:fixed;
+  font-family:"Prompt","Noto Sans Thai","Sarabun",Tahoma,system-ui,sans-serif;
+  line-height:1.6;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 56px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:10;background:rgba(13,10,24,.86);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
+nav .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+nav a{flex:none;color:var(--muted);text-decoration:none;font-size:.9rem;padding:6px 14px;border:1px solid var(--line);border-radius:999px;transition:.15s}
+nav a:hover{color:var(--gold);border-color:var(--gold)}
+
+/* hero */
+header.hero{padding:44px 0 20px}
+.eyebrow{color:var(--gold);font-size:.85rem;letter-spacing:.08em;font-weight:500}
+h1{margin:6px 0 10px;font-size:clamp(1.6rem,4.6vw,2.4rem);line-height:1.25;font-weight:700}
+.lead{color:var(--muted);margin:0;max-width:62ch}
+
+/* summary cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:26px 0 8px}
+.sc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.sc .t{color:var(--muted);font-size:.85rem}
+.sc .n{font-size:1.5rem;font-weight:700;color:var(--gold);line-height:1.3}
+.sc .s{color:var(--muted);font-size:.8rem}
+
+/* section heading */
+.sec{margin-top:44px}
+.sec-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-left:4px solid var(--gold);padding-left:12px;margin-bottom:14px}
+.sec-h h2{margin:0;font-size:1.3rem;font-weight:700}
+.sec-h .sub{color:var(--muted);font-size:.88rem}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px 12px}
+.meta{display:flex;gap:8px 18px;flex-wrap:wrap;color:var(--muted);font-size:.86rem;margin:0 4px 8px}
+.meta b{color:var(--text);font-weight:600}
+
+/* toggle */
+.toolbar{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:34px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.88rem;background:transparent;color:var(--muted);border:0;padding:6px 16px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#241a05;font-weight:600}
+.legend{color:var(--muted);font-size:.82rem}
+.legend .mx{color:var(--gold);font-weight:700}
+.legend .mn{color:var(--blue)}
+
+/* table */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.tbl{width:100%;min-width:640px;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tbl th{color:var(--muted);font-weight:500;font-size:.85rem;padding:8px 6px;text-align:center}
+.tbl td{padding:10px 6px;text-align:center;border-top:1px solid rgba(255,255,255,.06);font-size:.95rem}
+.tbl td.pos,.tbl th.pos{text-align:left;color:var(--muted);white-space:nowrap;padding-left:8px}
+.tbl td.mx{color:var(--gold);font-weight:700}
+.tbl td.mx::before{content:"▲";font-size:.55em;margin-right:3px;vertical-align:.25em}
+.tbl td.mn{color:var(--blue)}
+.tbl td.mn::before{content:"▼";font-size:.55em;margin-right:3px;vertical-align:.25em}
+.tbl .tot{border-left:1px dashed var(--line);color:var(--muted)}
+.tbl tr.sum td{border-top:1px solid var(--line);font-weight:600}
+.tbl tr.sum td.pos{color:var(--text)}
+
+/* bars */
+.bars{position:relative;height:180px;margin:22px 8px 6px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;align-items:end;border-bottom:1px solid var(--line)}
+.bar{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.bar i{display:block;width:100%;max-width:46px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--gold),#b7791f)}
+.bar-x{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;margin:4px 8px 0;text-align:center;color:var(--muted);font-size:.85rem}
+.bar-x b{display:block;color:var(--text);font-weight:600}
+.bar-x small{display:block;font-size:.72rem;font-variant-numeric:tabular-nums}
+.expect{position:absolute;left:0;right:0;border-top:1px dashed var(--red);pointer-events:none}
+.chart-note{color:var(--muted);font-size:.84rem;margin:12px 8px 0}
+
+/* notes */
+.note{margin-top:44px;padding:16px 18px;border:1px solid var(--gold);border-radius:var(--radius);background:linear-gradient(135deg,rgba(245,185,66,.08),rgba(124,80,200,.08));font-size:.9rem;color:var(--muted)}
+.note strong.warn{color:var(--red)}
+.note u{text-decoration-color:var(--gold)}
+footer{margin-top:28px;color:var(--muted);font-size:.8rem}
+footer p{margin:4px 0}
+
+@media (max-width:560px){
+  header.hero{padding-top:30px}
+  .bars,.bar-x{gap:3px;margin-left:0;margin-right:0}
+  .bar-x small{font-size:.62rem}
+  .bar-x .pc{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav aria-label="ไปยังส่วนต่างๆ"><div class="in">
+  <a href="#r2">รางวัลที่ 2</a><a href="#r3">รางวัลที่ 3</a><a href="#r4">รางวัลที่ 4</a><a href="#r5">รางวัลที่ 5</a><a href="#all">รวมทุกรางวัล</a>
+</div></nav>
+
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">สถิติเพื่อการศึกษา</div>
+  <h1>ความถี่เลข 0–9 รายหลัก<br>สลากกินแบ่งรัฐบาล รางวัลที่ 2 – 5</h1>
+  <p class="lead">นับจำนวนครั้งที่เลข 0–9 ปรากฏในแต่ละหลัก (แสน หมื่น พัน ร้อย สิบ หน่วย) ของเลข 6 หลักทุกรางวัล <span id="range"></span></p>
+  <div class="cards" id="cards"></div>
+</header>
+
+<div class="toolbar">
+  <div class="seg" role="group" aria-label="โหมดแสดงผล">
+    <button type="button" id="m-count" aria-pressed="true">จำนวนครั้ง</button>
+    <button type="button" id="m-pct" aria-pressed="false">ร้อยละ</button>
+  </div>
+  <div class="legend"><span class="mx">▲ ทอง</span> = ออกบ่อยสุดในหลักนั้น · <span class="mn">▼ ฟ้า</span> = ออกน้อยสุด · สีพื้นเข้มขึ้น = ออกมากกว่า</div>
+</div>
+
+<div id="sections"></div>
+
+<section class="sec" id="all">
+  <div class="sec-h"><h2>รวมทุกรางวัล (รางวัลที่ 2–5)</h2><span class="sub" id="all-sub"></span></div>
+  <div class="panel">
+    <div class="meta" id="all-meta"></div>
+    <div class="tw" id="all-table"></div>
+    <div id="all-chart"></div>
+  </div>
+</section>
+
+<div class="note">
+  <strong class="warn">ข้อควรทราบสำคัญ:</strong> สลากกินแบ่งรัฐบาลเป็นการสุ่มอิสระในแต่ละงวด ตัวเลขที่ออกบ่อยหรือไม่บ่อยในอดีต<u>ไม่ได้เพิ่มหรือลดโอกาส</u>ที่จะออกในงวดถัดไป
+  ความต่างของความถี่ในตารางเป็นความผันผวนตามธรรมชาติของการสุ่ม (ยิ่งมีเลขมาก ยิ่งใกล้ค่าคาดหมายของแต่ละหลัก) หน้านี้จัดทำเพื่อการศึกษาและความบันเทิงเท่านั้น ไม่ใช่คำแนะนำการซื้อสลาก
+</div>
+
+<footer>
+  <p>ที่มาข้อมูล: คลัง thai-lotto-archive (รวบรวมจาก kapook.com และ sanook.com)</p>
+  <p>งวด 17 ม.ค. 2569 เติมจากผลที่เผยแพร่ในเว็บข่าว (ไทยรัฐ, PPTV) เนื่องจากไฟล์ต้นฉบับของงวดนี้เสียหาย</p>
+  <p>บางงวดของรางวัลที่ 5 มีเลขซ้ำกันในรางวัลเดียวกัน ซึ่งเกิดได้ตามปกติ และนับรวมทุกครั้งที่ปรากฏ</p>
+</footer>
+</div>
+
+<script>
+const DATA = {"SECOND": {"draws": 474, "numbers": 2370, "positions": {"แสน": [237, 248, 253, 257, 248, 211, 214, 231, 249, 222], "หมื่น": [242, 232, 261, 240, 244, 232, 226, 264, 208, 221], "พัน": [255, 234, 252, 233, 245, 207, 241, 237, 228, 238], "ร้อย": [241, 240, 245, 226, 227, 238, 218, 250, 246, 239], "สิบ": [260, 253, 237, 228, 231, 216, 212, 254, 235, 244], "หน่วย": [238, 227, 252, 224, 220, 244, 261, 237, 246, 221]}}, "THIRD": {"draws": 474, "numbers": 4740, "positions": {"แสน": [495, 495, 472, 497, 417, 494, 446, 480, 470, 474], "หมื่น": [481, 449, 474, 483, 489, 495, 461, 450, 488, 470], "พัน": [456, 500, 451, 488, 469, 483, 502, 467, 466, 458], "ร้อย": [466, 445, 468, 482, 473, 488, 494, 476, 484, 464], "สิบ": [467, 456, 510, 428, 469, 538, 467, 471, 475, 459], "หน่วย": [474, 494, 461, 492, 511, 451, 464, 447, 465, 481]}}, "FOURTH": {"draws": 474, "numbers": 23700, "positions": {"แสน": [2375, 2393, 2422, 2391, 2422, 2313, 2330, 2350, 2367, 2337], "หมื่น": [2375, 2376, 2360, 2414, 2330, 2323, 2407, 2314, 2418, 2383], "พัน": [2389, 2392, 2419, 2371, 2306, 2353, 2422, 2360, 2335, 2353], "ร้อย": [2430, 2342, 2435, 2357, 2347, 2349, 2306, 2369, 2378, 2387], "สิบ": [2421, 2405, 2392, 2383, 2337, 2316, 2367, 2370, 2308, 2401], "หน่วย": [2339, 2417, 2363, 2329, 2398, 2364, 2383, 2308, 2353, 2446]}}, "FIFTH": {"draws": 474, "numbers": 47400, "positions": {"แสน": [4698, 4737, 4846, 4721, 4840, 4617, 4678, 4739, 4757, 4767], "หมื่น": [4764, 4765, 4857, 4692, 4703, 4809, 4861, 4671, 4663, 4615], "พัน": [4748, 4678, 4713, 4780, 4621, 4688, 4901, 4712, 4741, 4818], "ร้อย": [4756, 4728, 4680, 4771, 4828, 4688, 4746, 4586, 4846, 4771], "สิบ": [4827, 4668, 4639, 4802, 4701, 4731, 4848, 4766, 4833, 4585], "หน่วย": [4826, 4717, 4800, 4667, 4663, 4787, 4768, 4643, 4703, 4826]}}};
+const META = {"draws": 474, "range": "งวด 30 ธ.ค. 2549 ถึง 1 พ.ย. 2569"};
+
+const PRIZES = [
+  {key:"SECOND", id:"r2", name:"รางวัลที่ 2", per:5},
+  {key:"THIRD",  id:"r3", name:"รางวัลที่ 3", per:10},
+  {key:"FOURTH", id:"r4", name:"รางวัลที่ 4", per:50},
+  {key:"FIFTH",  id:"r5", name:"รางวัลที่ 5", per:100},
+];
+const POS = Object.keys(DATA.SECOND.positions); // แสน..หน่วย
+const nf = new Intl.NumberFormat("th-TH");
+let mode = "count";
+
+const sum = a => a.reduce((x,y)=>x+y,0);
+const fmtPct = (v,t) => (v/t*100).toFixed(2)+"%";
+
+function tableHTML(rows, numbersPerRow){
+  // rows: [{label, counts[10]}], numbersPerRow: จำนวนเลขที่นับต่อแถวของหลักเดี่ยว
+  let h = '<table class="tbl"><thead><tr><th class="pos">หลัก</th>';
+  for(let d=0; d<10; d++) h += `<th scope="col">${d}</th>`;
+  h += '<th class="tot">รวม</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const total = sum(r.counts);
+    const mx = Math.max(...r.counts), mn = Math.min(...r.counts);
+    const span = (mx-mn)||1;
+    h += `<tr class="${r.sum?'sum':''}"><td class="pos">${r.label}</td>`;
+    r.counts.forEach(v=>{
+      const cls = r.sum ? "" : (v===mx ? "mx" : v===mn ? "mn" : "");
+      const a = r.sum ? 0 : (0.03 + 0.17*(v-mn)/span);
+      const txt = mode==="count" ? nf.format(v) : fmtPct(v,total);
+      h += `<td class="${cls}" style="background:rgba(245,185,66,${a.toFixed(3)})">${txt}</td>`;
+    });
+    h += `<td class="tot">${mode==="count" ? nf.format(total) : "100%"}</td></tr>`;
+  });
+  return h + "</tbody></table>";
+}
+
+function prizeRows(p){
+  const rows = POS.map(pos=>({label:"หลัก"+pos, counts:DATA[p.key].positions[pos]}));
+  const all = Array.from({length:10},(_,d)=>sum(POS.map(pos=>DATA[p.key].positions[pos][d])));
+  rows.push({label:"รวมทุกหลัก", counts:all, sum:true});
+  return rows;
+}
+
+function render(){
+  // summary cards
+  const totalNums = sum(PRIZES.map(p=>DATA[p.key].numbers));
+  document.getElementById("cards").innerHTML =
+    PRIZES.map(p=>`<div class="sc"><div class="t">${p.name}</div><div class="n">${nf.format(DATA[p.key].numbers)} เลข</div><div class="s">${p.per} ชุดต่องวด × ${nf.format(DATA[p.key].draws)} งวด</div></div>`).join("")
+    + `<div class="sc"><div class="t">รวมทุกรางวัล</div><div class="n">${nf.format(totalNums)} เลข</div><div class="s">${nf.format(totalNums*6)} หลักที่นับ</div></div>`;
+  document.getElementById("range").textContent = `(${META.range}, ${nf.format(META.draws)} งวด)`;
+
+  // four prize sections
+  document.getElementById("sections").innerHTML = PRIZES.map(p=>{
+    const n = DATA[p.key].numbers, exp = n/10;
+    return `<section class="sec" id="${p.id}">
+      <div class="sec-h"><h2>${p.name}</h2><span class="sub">${p.per} ชุดต่องวด · ${nf.format(DATA[p.key].draws)} งวด</span></div>
+      <div class="panel">
+        <div class="meta"><span>เลขที่นับต่อหลัก: <b>${nf.format(n)}</b></span><span>ค่าคาดหมายต่อเลขต่อหลัก (หากสุ่มสมบูรณ์): <b>${exp.toLocaleString("th-TH",{maximumFractionDigits:1})} ครั้ง (10%)</b></span></div>
+        <div class="tw">${tableHTML(prizeRows(p))}</div>
+      </div></section>`;
+  }).join("");
+
+  // combined
+  const allRows = POS.map(pos=>({label:"หลัก"+pos, counts:Array.from({length:10},(_,d)=>sum(PRIZES.map(p=>DATA[p.key].positions[pos][d])))}));
+  const grand = Array.from({length:10},(_,d)=>sum(allRows.map(r=>r.counts[d])));
+  allRows.push({label:"รวมทุกหลัก", counts:grand, sum:true});
+  document.getElementById("all-sub").textContent = `${nf.format(totalNums)} เลข จาก 4 รางวัล`;
+  document.getElementById("all-meta").innerHTML =
+    `<span>เลขที่นับต่อหลัก: <b>${nf.format(totalNums)}</b></span><span>ค่าคาดหมายต่อเลขต่อหลัก: <b>${(totalNums/10).toLocaleString("th-TH",{maximumFractionDigits:1})} ครั้ง (10%)</b></span>`;
+  document.getElementById("all-table").innerHTML = tableHTML(allRows);
+
+  // bar chart of share of each digit across all positions
+  const tot = sum(grand), pct = grand.map(v=>v/tot*100);
+  const axis = Math.max(12, Math.ceil(Math.max(...pct)+1));
+  const bars = pct.map(p=>`<div class="bar"><i style="height:${(p/axis*100).toFixed(1)}%"></i></div>`).join("");
+  const labels = pct.map((p,d)=>`<div><b>${d}</b><small>${p.toFixed(2)}<span class="pc">%</span></small></div>`).join("");
+  document.getElementById("all-chart").innerHTML =
+    `<div class="bars" role="img" aria-label="สัดส่วนของเลข 0 ถึง 9 เมื่อรวมทุกหลักและทุกรางวัล">${bars}<div class="expect" style="bottom:${(10/axis*100).toFixed(1)}%"></div></div><div class="bar-x">${labels}</div>
+     <p class="chart-note">สัดส่วนของเลขแต่ละตัว เมื่อรวมทุกหลักและทุกรางวัล (แกนเริ่มที่ 0%) อยู่ในช่วง ${Math.min(...pct).toFixed(2)}% – ${Math.max(...pct).toFixed(2)}% ใกล้เคียงค่าคาดหมาย 10% (เส้นประสีแดง) ตัวเลขใต้แท่งคือร้อยละ</p>`;
+}
+
+function setMode(m){
+  mode = m;
+  document.getElementById("m-count").setAttribute("aria-pressed", m==="count");
+  document.getElementById("m-pct").setAttribute("aria-pressed", m==="pct");
+  render();
+}
+document.getElementById("m-count").onclick = ()=>setMode("count");
+document.getElementById("m-pct").onclick = ()=>setMode("pct");
+render();
+</script>
+</body>
+</html>
