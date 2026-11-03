@@ -107,6 +107,14 @@ table.tbl{width:100%;min-width:640px;border-collapse:collapse;font-variant-numer
 .item .go{color:var(--gold);white-space:nowrap}
 .car-btn{position:absolute;top:calc(50% - 36px);width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(13,10,24,.85);color:var(--text);font:inherit;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .car-btn:hover{border-color:var(--gold);color:var(--gold)}
+.car-btn[hidden],.dots[hidden]{display:none}
+/* hot digits summary */
+.hot{margin-top:16px;border:2px solid var(--gold);border-radius:14px;background:rgba(245,185,66,.08);padding:14px 16px}
+.hot .ht{font-weight:700;color:var(--gold);font-size:1rem;margin-bottom:10px}
+.hot .dg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;text-align:center}
+.hot .dg b{display:block;font-size:clamp(1.3rem,6vw,2rem);line-height:1.2;color:var(--text);font-weight:700}
+.hot .dg small{display:block;color:var(--muted);font-size:.78rem}
+.hot .hn{margin:10px 0 0;color:var(--muted);font-size:.8rem}
 .car-btn.prev{left:-6px}.car-btn.next{right:-6px}
 .dots{display:flex;justify-content:center;gap:8px;margin:14px 0 4px}
 .dots button{width:9px;height:9px;padding:0;border-radius:50%;border:0;background:var(--line);cursor:pointer}
@@ -159,11 +167,12 @@ footer p{margin:4px 0}
     <div class="meta" id="all-meta"></div>
     <div class="tw" id="all-table"></div>
     <div id="all-chart"></div>
+    <div id="all-hot"></div>
   </div>
 </section>
 
 <section class="sec shop" id="shop" hidden>
-  <div class="sec-h"><h2>ของน่าซื้อ</h2><span class="sub">ลิงก์พันธมิตร Shopee Affiliate</span></div>
+  <div class="sec-h"><h2>แอบขาย</h2><span class="sub">ลิงก์พันธมิตร Shopee Affiliate</span></div>
   <div class="panel">
     <div class="car">
       <div class="track" id="track" tabindex="0" role="region" aria-label="รายการสินค้า เลื่อนซ้ายขวาเพื่อดูเพิ่ม"></div>
@@ -193,7 +202,18 @@ const META = {"draws": 474, "range": "งวด 30 ธ.ค. 2549 ถึง 1 พ
 
 // รายการสินค้า Shopee Affiliate: ใส่ได้หลายชิ้น ถ้าเว้นว่าง [] ส่วนนี้จะซ่อนไปเอง
 // รูปแบบ: {title:"ชื่อสินค้า", img:"images/ชื่อไฟล์.jpg", url:"https://s.shopee.co.th/..."}
-const AFFILIATE = [];
+const AFFILIATE = [
+  {
+    "title": "เต่าเหยียบโลก สเปรย์ระงับกลิ่นกาย สูตร Pure White",
+    "img": "Affiliate/1.jpg",
+    "url": "https://s.shopee.co.th/1qdJ0g93Ac"
+  },
+  {
+    "title": "เต่าเหยียบโลก แป้งระงับกลิ่นกาย",
+    "img": "Affiliate/2.jpg",
+    "url": "https://s.shopee.co.th/1qdJ0p0oCc"
+  }
+];
 
 const PRIZES = [
   {key:"SECOND", id:"r2", name:"รางวัลที่ 2", per:5},
@@ -236,6 +256,24 @@ function prizeRows(p){
   return rows;
 }
 
+// กรอบสรุป: เลขที่ออกบ่อยสุดของแต่ละหลัก (สถิติย้อนหลัง ไม่ใช่คำทำนาย)
+function hotHTML(rows, title){
+  const cells = rows.map(r=>{
+    const mx = Math.max(...r.counts);
+    const ds = r.counts.map((v,d)=>v===mx?d:-1).filter(d=>d>=0).join(",");
+    return `<div><b>${ds}</b><small>${r.label.replace("หลัก","")}</small></div>`;
+  }).join("");
+  return `<div class="hot"><div class="ht">${title}</div><div class="dg">${cells}</div>
+    <p class="hn">เป็นเพียงการรวมตัวเลขที่พบบ่อยสุดในอดีตของแต่ละหลัก ไม่ใช่เลขที่คาดว่าจะออก และเลขชุดนี้อาจไม่เคยออกจริงเลยก็ได้</p></div>`;
+}
+
+const SHOP = document.getElementById("shop");
+function placeShop(){
+  if(!SHOP.dataset.on) return;
+  const r4 = document.getElementById("r4");   // วางระหว่างรางวัลที่ 3 กับ 4
+  if(r4 && r4.parentNode) r4.parentNode.insertBefore(SHOP, r4);
+}
+
 function render(){
   // summary cards
   const totalNums = sum(PRIZES.map(p=>DATA[p.key].numbers));
@@ -252,8 +290,10 @@ function render(){
       <div class="panel">
         <div class="meta"><span>เลขที่นับต่อหลัก: <b>${nf.format(n)}</b></span><span>ค่าคาดหมายต่อเลขต่อหลัก (หากสุ่มสมบูรณ์): <b>${exp.toLocaleString("th-TH",{maximumFractionDigits:1})} ครั้ง (10%)</b></span></div>
         <div class="tw">${tableHTML(prizeRows(p))}</div>
+        ${hotHTML(prizeRows(p).slice(0,6), "เลขที่ออกบ่อยสุดในแต่ละหลัก ("+p.name+")")}
       </div></section>`;
   }).join("");
+  placeShop();
 
   // combined
   const allRows = POS.map(pos=>({label:"หลัก"+pos, counts:Array.from({length:10},(_,d)=>sum(PRIZES.map(p=>DATA[p.key].positions[pos][d])))}));
@@ -263,6 +303,7 @@ function render(){
   document.getElementById("all-meta").innerHTML =
     `<span>เลขที่นับต่อหลัก: <b>${nf.format(totalNums)}</b></span><span>ค่าคาดหมายต่อเลขต่อหลัก: <b>${(totalNums/10).toLocaleString("th-TH",{maximumFractionDigits:1})} ครั้ง (10%)</b></span>`;
   document.getElementById("all-table").innerHTML = tableHTML(allRows);
+  document.getElementById("all-hot").innerHTML = hotHTML(allRows.slice(0,6), "เลขที่ออกบ่อยสุดในแต่ละหลัก (รวมทุกรางวัล)");
 
   // bar chart of share of each digit across all positions
   const tot = sum(grand), pct = grand.map(v=>v/tot*100);
@@ -309,12 +350,19 @@ function renderShop(){
     if(track.scrollLeft + track.clientWidth >= track.scrollWidth - 2) return items.length-1;
     return Math.min(items.length-1, Math.max(0, Math.round(track.scrollLeft / w())));
   };
-  const mark = ()=>{const c=current(); [...dots.children].forEach((d,i)=>d.setAttribute("aria-current", i===c));};
+  const mark = ()=>{
+    const scrollable = track.scrollWidth > track.clientWidth + 2;   // ถ้าแสดงครบแล้วไม่ต้องมีปุ่ม/จุด
+    dots.hidden = !scrollable;
+    document.getElementById("car-prev").hidden = !scrollable;
+    document.getElementById("car-next").hidden = !scrollable;
+    const c = current(); [...dots.children].forEach((d,i)=>d.setAttribute("aria-current", i===c));
+  };
   const step = n => track.scrollBy({left:n*w(), behavior:"smooth"});
   document.getElementById("car-prev").onclick = ()=>step(-1);
   document.getElementById("car-next").onclick = ()=>step(1);
   track.addEventListener("scroll", mark, {passive:true});
   window.addEventListener("resize", mark);
+  SHOP.dataset.on = "1"; placeShop();
   sec.hidden = false; mark();
 }
 
