@@ -147,6 +147,18 @@ table.mini{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums
 .mini th{color:var(--muted);font-weight:500;text-align:right;padding:6px 8px}
 .mini td{padding:7px 8px;text-align:right;border-top:1px solid rgba(255,255,255,.06)}
 .mini th:first-child,.mini td:first-child{text-align:left}
+.fw{margin-top:10px}.fw-g{margin:8px 0}.fw-t{color:var(--gold);font-weight:600;font-size:.88rem;margin-bottom:4px}.fw-c{display:flex;flex-wrap:wrap;gap:6px}.chip{display:inline-flex;align-items:baseline;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-variant-numeric:tabular-nums;font-weight:700;color:var(--text);letter-spacing:.06em}.chip small{color:var(--muted);font-weight:400;font-size:.7rem;letter-spacing:0}
+.sim-ctl [hidden]{display:none!important}
+.own-top{display:flex;gap:10px;align-items:center;margin:0 4px 12px;color:var(--muted);font-size:.9rem}
+.own-in{font:inherit;color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0}
+.own-top .own-in{width:90px}
+.own-grid{display:grid;gap:12px;margin:0 4px 14px}
+.own-p{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.own-r{display:grid;grid-template-columns:minmax(0,1fr) 70px 34px;gap:6px 8px;align-items:center;margin:6px 0;padding-bottom:6px;border-bottom:1px dashed rgba(255,255,255,.07)}
+.own-n{letter-spacing:.12em;font-weight:700}.own-q{width:70px;text-align:center}
+.own-sc,.own-am{font-size:.82rem;color:var(--muted)}.own-am{text-align:right;color:var(--text)}
+.own-x{font:inherit;background:transparent;border:0;color:var(--muted);cursor:pointer;height:34px}.own-meta{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.own-add{font:inherit;font-size:.88rem;color:var(--gold);background:transparent;border:1px dashed var(--line);border-radius:999px;padding:5px 14px;cursor:pointer;margin-top:4px}
 .sim-note{margin:10px 4px 0;color:var(--muted);font-size:.8rem}
 .sim-note p{margin:6px 0}
 
@@ -215,10 +227,15 @@ footer p{margin:4px 0}
 </section>
 
 <section class="sec" id="sim" hidden>
-  <div class="sec-h"><h2>จำลองซื้อย้อนหลัง</h2><span class="sub" id="sim-sub"></span></div>
+  <div class="sec-h"><h2>จำลองซื้อ</h2><span class="sub" id="sim-sub"></span></div>
   <div class="panel">
-    <p class="sim-lead">ถ้าซื้อสลากรางวัลที่ 2, 3, 4 และ 5 อย่างละกี่ใบก็ตามที่เลือก ทุกงวดตั้งแต่อดีต แล้วตรวจกับผลที่ออกจริง จะได้หรือเสียเท่าไร</p>
+    <p class="sim-lead" id="sim-lead">ถ้าซื้อสลากรางวัลที่ 2, 3, 4 และ 5 อย่างละกี่ใบก็ตามที่เลือก ทุกงวดตั้งแต่อดีต แล้วตรวจกับผลที่ออกจริง จะได้หรือเสียเท่าไร</p>
     <div class="sim-ctl">
+      <div class="seg" role="group" aria-label="โหมดจำลอง">
+        <button type="button" id="sim-m-back" aria-pressed="true">ย้อนหลัง</button>
+        <button type="button" id="sim-m-fwd" aria-pressed="false">งวดที่จะถึง</button>
+        <button type="button" id="sim-m-own" aria-pressed="false">เลือกเลขเอง</button>
+      </div>
       <label for="sim-k">ใบต่อรางวัล</label>
       <div class="stepper"><button type="button" id="sim-minus" aria-label="ลดจำนวนใบ">−</button><input id="sim-k" type="number" min="1" max="10" step="1" value="2" inputmode="numeric"><button type="button" id="sim-plus" aria-label="เพิ่มจำนวนใบ">+</button></div>
       <div class="seg" role="group" aria-label="วิธีเลือกเลข">
@@ -344,13 +361,14 @@ function hotHTML(rows, title, note){
 
 // งวดที่ใกล้ที่สุด: วันที่ 1 หรือ 16 ถัดไป (นับวันนี้ด้วย) ตามวันที่ของผู้เข้าชม
 const TH_M = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-function upcomingSlot(){
-  const t = new Date(), y = t.getFullYear(), m = t.getMonth(), d = t.getDate();
-  let mm, dd;
-  if(d <= 1){ mm = m; dd = 1; } else if(d <= 16){ mm = m; dd = 16; } else { mm = (m+1)%12; dd = 1; }
-  const key = String(mm+1).padStart(2,"0")+"-"+String(dd).padStart(2,"0");
-  return {key, label: dd+" "+TH_M[mm]};
+function nextDraw(){
+  const t = new Date(), y = t.getFullYear(), m = t.getMonth();
+  const cands = [new Date(y,m,1,17), new Date(y,m,16,17), new Date(y,m+1,1,17)];
+  const c = cands.find(x=>x > t) || new Date(y,m+2,1,17);
+  const mm = c.getMonth(), dd = c.getDate();
+  return {key:String(mm+1).padStart(2,"0")+"-"+String(dd).padStart(2,"0"), label:dd+" "+TH_M[mm], full:dd+" "+TH_M[mm]+" "+(c.getFullYear()+543)};
 }
+function upcomingSlot(){ const n = nextDraw(); return {key:n.key, label:n.label}; }
 
 // กรอบเลขที่ออกบ่อยสุดเฉพาะงวดตามวันที่ (ต่อจากกรอบรวมทุกงวด) rowsFor(slot) -> 6 แถว
 function slotHotHTML(rowsFor, who){
@@ -519,7 +537,7 @@ function renderBT(){
 function renderSim(){
   if(!BT) return;
   const sec = document.getElementById("sim"), out = document.getElementById("sim-out"), kin = document.getElementById("sim-k");
-  let k = 2, strat = "A";
+  let k = 2, strat = "A", simMode = "back";
   const baht = v => nf.format(Math.round(v)), pct = v => (v*100).toFixed(1)+"%";
   const thDate = iso => { const [y,m,d]=iso.split("-").map(Number); return d+" "+TH_M[m-1]+" "+(y+543); };
   document.getElementById("sim-sub").textContent = `${nf.format(BT.draws)} งวด · ${thDate(BT.start)} ถึง ${thDate(BT.end)}`;
@@ -540,7 +558,7 @@ function renderSim(){
       <text x="${L}" y="${H-8}">${thDate(BT.dates[0])}</text><text x="${W-R}" y="${H-8}" text-anchor="end">${thDate(BT.dates[BT.dates.length-1])}</text>
     </svg>`;
   }
-  function update(){
+  function updateBack(){
     const R = BT[strat][String(k)], won = R.won, n = BT.draws, tk = 4*k, perDraw = tk*BT.price;
     const spent = n*perDraw, tot = won.reduce((a,b)=>a+b,0), net = tot-spent, ret = tot/spent;
     let lo, mid, hi, rank, nullName;
@@ -572,11 +590,158 @@ function renderSim(){
         <p><b>จำไว้:</b> ผลย้อนหลังไม่รับประกันอนาคต การออกสลากแต่ละงวดเป็นการสุ่มอิสระ เงินรางวัลทั้งระบบคืนผู้ซื้อราว 60% จึงคาดว่าซื้อต่อเนื่องจะขาดทุนโดยเฉลี่ย ซื้อเมื่อรับความเสี่ยงนี้ได้เท่านั้น</p>
       </div>`;
   }
+
+  // ---------- งวดที่จะถึง ----------
+  const RK = c => [0,1,2,3,4,5,6,7,8,9].sort((a,b)=>c[b]-c[a]||a-b);
+  function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  const CATS6 = [["first","รางวัลที่ 1",6000000,1],["near","ข้างเคียงรางวัลที่ 1",100000,2],["p2","รางวัลที่ 2",200000,5],["p3","รางวัลที่ 3",80000,10],["p4","รางวัลที่ 4",40000,50],["p5","รางวัลที่ 5",20000,100]];
+  function makeTickets(slotKey, st){
+    const sl = SLOTS[slotKey], useB = st==="B" && sl;
+    return PRIZES.map(p=>{
+      const ranks = POS.map(pos=>RK(useB && sl.freq[p.key] ? sl.freq[p.key][pos] : DATA[p.key].positions[pos]));
+      return {p, nums: Array.from({length:k},(_,j)=>ranks.map(r=>r[j]).join(""))};
+    });
+  }
+  function calcStats(mult,T,budget){
+    const nums = Object.keys(mult), D = nums.length;
+    const pre = {}, suf = {}, l2 = {};
+    nums.forEach(n=>{ const m=mult[n]; pre[n.slice(0,3)]=(pre[n.slice(0,3)]||0)+m; suf[n.slice(3)]=(suf[n.slice(3)]||0)+m; l2[n.slice(4)]=(l2[n.slice(4)]||0)+m; });
+    const Df = Object.keys(pre).length, Dl = Object.keys(suf).length, D2 = Object.keys(l2).length;
+    const P6 = 1-Math.pow(1-168e-6, D), P25 = 1-Math.pow(1-165e-6, D);
+    const Pf = 1-(1000-Df)*(999-Df)/(1000*999), Pl = 1-(1000-Dl)*(999-Dl)/(1000*999), P2 = D2/100;
+    const Pany = 1-(1-P6)*(1-Pf)*(1-Pl)*(1-P2);
+    // จำลอง Monte Carlo หาโอกาสคุ้มทุน
+    const rnd = mulberry32(20261116), N = 20000; let be = 0;
+    const pk = Object.keys(pre), sk = Object.keys(suf), tk = Object.keys(l2);
+    for(let i=0;i<N;i++){
+      let w = 0;
+      for(const n of nums){ const r=Math.floor(rnd()*1e6), m=mult[n];
+        if(r<1) w+=6000000*m; else if(r<3) w+=100000*m; else if(r<8) w+=200000*m; else if(r<18) w+=80000*m; else if(r<68) w+=40000*m; else if(r<168) w+=20000*m; }
+      const f1=Math.floor(rnd()*1000); let f2=Math.floor(rnd()*999); if(f2>=f1) f2++;
+      const g1=Math.floor(rnd()*1000); let g2=Math.floor(rnd()*999); if(g2>=g1) g2++;
+      const z=Math.floor(rnd()*100);
+      for(const x of [f1,f2]){ const key=String(x).padStart(3,"0"); if(pre[key]) w+=4000*pre[key]; }
+      for(const x of [g1,g2]){ const key=String(x).padStart(3,"0"); if(suf[key]) w+=4000*suf[key]; }
+      const k2=String(z).padStart(2,"0"); if(l2[k2]) w+=2000*l2[k2];
+      if(w>=budget) be++;
+    }
+    const Pbe = be/N;
+    const per = {first:1e-6,near:2e-6,p2:5e-6,p3:10e-6,p4:50e-6,p5:100e-6,f3:2e-3,l3:2e-3,l2:1e-2};
+    const chanceSet = {}; CATS6.forEach(([id,,,m])=>chanceSet[id]=1-Math.pow(1-m*1e-6,D)); chanceSet.f3=Pf; chanceSet.l3=Pl; chanceSet.l2=P2;
+    const rows = BT_CAT.map(([id,name,rate])=>`<tr><td>${name}</td><td>${nf.format(rate)}</td><td>${(chanceSet[id]*100).toFixed(chanceSet[id]<0.01?3:2)}%</td><td>${baht(T*rate*per[id])}</td></tr>`).join("");
+    return {nums,D,Pany,Pbe,P25,rows,N};
+  }
+  function updateFwd(){
+    const nd = nextDraw(), sl = SLOTS[nd.key];
+    const groups = makeTickets(nd.key, strat), all = groups.flatMap(g=>g.nums), T = all.length, budget = T*BT.price;
+    const mult = {}; all.forEach(n=>mult[n]=(mult[n]||0)+1);
+    const {D,Pany,Pbe,P25,rows,N} = calcStats(mult,T,budget);
+    const expRet = T*BT.price*0.6;
+    const chips = groups.map(g=>`<div class="fw-g"><div class="fw-t">${g.p.name}</div><div class="fw-c">${g.nums.map((n,j)=>`<span class="chip"><small>${j+1}</small>${n}</span>`).join("")}</div></div>`).join("");
+    const R = BT[strat][String(k)], spent = BT.draws*budget, tot = R.won.reduce((a,b)=>a+b,0);
+    const stName = strat==="A" ? "เลขเด่นทุกงวด" : "เลขเด่นเฉพาะงวดวันเดียวกัน";
+    const slInfo = (strat==="B" && sl) ? ` · ใช้ข้อมูล ${sl.draws} งวด` : "";
+    document.getElementById("sim-sub").textContent = `งวดวันที่ ${nd.full}${slInfo}`;
+    out.innerHTML = `
+      <p class="sim-sum">งวดที่จะถึง: <b>${nd.full}</b> (วันออกรางวัลอาจเลื่อนเมื่อตรงวันหยุด) · ซื้อรางวัลละ <b>${k}</b> ใบ × 4 รางวัล = <b>${T}</b> ใบ ใบละ ${BT.price} บาท · วิธีเลือกเลข: <b>${stName}</b></p>
+      <div class="sim-cards">
+        <div class="sc"><div class="t">งบที่ใช้</div><div class="n">${baht(budget)}</div><div class="s">บาท</div></div>
+        <div class="sc"><div class="t">โอกาสถูกอะไรสักอย่าง</div><div class="n">${(Pany*100).toFixed(1)}%</div><div class="s">ไม่ถูกเลย ${((1-Pany)*100).toFixed(1)}%</div></div>
+        <div class="sc"><div class="t">โอกาสคุ้มทุนหรือกำไร</div><div class="n">${(Pbe*100).toFixed(1)}%</div><div class="s">รางวัลรวม ≥ ${baht(budget)} บาท (จำลอง ${nf.format(N)} ครั้ง)</div></div>
+        <div class="sc"><div class="t">คาดว่าได้คืนเฉลี่ย</div><div class="n">${baht(expRet)}</div><div class="s">บาท · เสียเฉลี่ย ${baht(budget-expRet)} บาท</div></div>
+        <div class="sc"><div class="t">โอกาสถูกรางวัลที่ 2–5</div><div class="n">${(P25*100).toFixed(2)}%</div><div class="s">ทั้งชุดรวมกัน</div></div>
+      </div>
+      <div class="tw"><table class="mini"><thead><tr><th>ประเภทรางวัล</th><th>เงินรางวัลต่อใบ</th><th>โอกาสถูก (ทั้งชุด)</th><th>คาดได้คืน (บาท)</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="sim-ctx"><b>รายการเลขที่ได้จากวิธีนี้</b> (ไม่ใช่เลขที่คาดว่าจะออก ผลออกแต่ละงวดเป็นการสุ่มอิสระ) · ใบที่ 1 ใช้เลขอันดับ 1 ของทุกหลัก ใบที่ 2 ใช้อันดับ 2 และต่อไป<div class="fw">${chips}</div></div>
+      <div class="sim-ctx">ผลทดสอบย้อนหลังของวิธีนี้ (${nf.format(BT.draws)} งวด ซื้อชุดเดียวกันนี้): ได้คืนรวม <b>${pct(tot/spent)}</b> ของเงินที่จ่าย เทียบกับค่าคาดเฉลี่ย 60% ดูรายละเอียดและช่วงความบังเอิญในโหมด "ย้อนหลัง"</div>
+      <div class="sim-note">
+        <p><b>วิธีคำนวณ:</b> เลขแต่ละใบมีโอกาสถูกเท่ากันทุกใบไม่ว่าจะเป็นเลขอะไร (สลาก 6 หลักรวมทุกรางวัลประมาณ 0.0168% ต่อใบ + เลขหน้า 3 ตัวและเลขท้าย 3 ตัวอย่างละ 0.2% + เลขท้าย 2 ตัว 1%) เลขซ้ำกันนับเป็นเลขเดียวในการหาโอกาส แต่นับเงินรางวัลตามจำนวนใบ ส่วนโอกาสคุ้มทุนมาจากการจำลองสุ่มผลรางวัล ${nf.format(N)} ครั้ง</p>
+        <p><b>จำไว้:</b> เงินรางวัลทั้งระบบคืนผู้ซื้อราว 60% ของเงินที่ซื้อ ค่าคาดเฉลี่ยจึงขาดทุนเสมอ เลขเด่นจากสถิติไม่ได้เพิ่มโอกาสถูก ใช้หน้านี้ดูว่า "ควรซื้อหรือไม่" และ "ซื้อได้แค่ไหนที่รับการเสียเงินได้" ไม่ใช่ตัวช่วยทำนาย</p>
+      </div>`;
+  }
+
+  // ---------- เลือกเลขเอง ----------
+  let own = {SECOND:[{n:"",q:1}], THIRD:[{n:"",q:1}], FOURTH:[{n:"",q:1}], FIFTH:[{n:"",q:1}]}, ownPrice = BT.price, ownBuilt = false;
+  const topSet = (p,pos)=>{ const c=DATA[p.key].positions[pos], mx=Math.max(...c); return c.map((v,d)=>v===mx?d:-1).filter(d=>d>=0); };
+  const TOPS = {}; PRIZES.forEach(p=>TOPS[p.key]=POS.map(pos=>topSet(p,pos)));
+  function ownScore(p,n){ let m=0; for(let i=0;i<6;i++) if(TOPS[p.key][i].includes(+n[i])) m++; return m; }
+  const ownExp = p => TOPS[p.key].reduce((a,t)=>a+t.length/10,0);
+  function buildOwn(){
+    document.getElementById("sim-sub").textContent = "ใส่เลขที่คิดจะซื้อเอง";
+    out.innerHTML = `
+      <div class="own-top"><label for="own-price">ราคาต่อใบ (บาท)</label><input id="own-price" class="own-in" type="number" min="1" step="1" value="${ownPrice}" inputmode="numeric"></div>
+      <div class="own-grid" id="own-grid">${PRIZES.map(p=>`<div class="own-p" data-k="${p.key}"><div class="fw-t">${p.name}</div><div class="own-rows"></div><button type="button" class="own-add" data-k="${p.key}">+ เพิ่ม</button></div>`).join("")}</div>
+      <div id="own-res"></div>`;
+    PRIZES.forEach(p=>drawRows(p));
+    document.getElementById("own-price").addEventListener("input",e=>{ const v=+e.target.value; ownPrice = v>0?v:BT.price; calcOwn(); });
+    out.querySelectorAll(".own-add").forEach(b=>b.onclick=()=>{ const key=b.dataset.k; own[key].push({n:"",q:1}); drawRows(PRIZES.find(p=>p.key===key)); });
+    ownBuilt = true; calcOwn();
+  }
+  function drawRows(p){
+    const box = out.querySelector(`.own-p[data-k="${p.key}"] .own-rows`);
+    box.innerHTML = own[p.key].map((r,i)=>`<div class="own-r" data-i="${i}">
+      <input class="own-in own-n" inputmode="numeric" maxlength="6" placeholder="เลข 6 หลัก" value="${r.n}" aria-label="${p.name} เลขที่จะซื้อ">
+      <input class="own-in own-q" type="number" min="1" max="999" value="${r.q}" inputmode="numeric" aria-label="จำนวนใบ">
+      <button type="button" class="own-x" aria-label="ลบ">✕</button>
+      <div class="own-meta"><span class="own-sc"></span><span class="own-am"></span></div></div>`).join("");
+    box.querySelectorAll(".own-r").forEach(row=>{
+      const i = +row.dataset.i, r = own[p.key][i], ni = row.querySelector(".own-n"), qi = row.querySelector(".own-q");
+      ni.addEventListener("input",()=>{ const v=ni.value.replace(/\D/g,"").slice(0,6); if(v!==ni.value) ni.value=v; r.n=v; calcOwn(); });
+      qi.addEventListener("input",()=>{ const v=Math.floor(+qi.value); r.q = v>=1?Math.min(v,999):1; calcOwn(); });
+      row.querySelector(".own-x").onclick=()=>{ if(own[p.key].length>1) own[p.key].splice(i,1); else own[p.key][0]={n:"",q:1}; drawRows(p); calcOwn(); };
+    });
+    calcOwn();
+  }
+  function calcOwn(){
+    const res = document.getElementById("own-res"); if(!res) return;
+    const mult = {}; let T = 0, bad = 0;
+    PRIZES.forEach(p=>{
+      const box = out.querySelector(`.own-p[data-k="${p.key}"]`); if(!box) return;
+      box.querySelectorAll(".own-r").forEach(row=>{
+        const r = own[p.key][+row.dataset.i], sc = row.querySelector(".own-sc"), am = row.querySelector(".own-am");
+        if(/^\d{6}$/.test(r.n)){
+          mult[r.n]=(mult[r.n]||0)+r.q; T+=r.q;
+          sc.textContent = `ตรง ${ownScore(p,r.n)}/6 · สุ่ม ${ownExp(p).toFixed(2)}`; am.textContent = baht(r.q*ownPrice)+" บาท";
+        } else { if(r.n) bad++; sc.textContent = r.n ? "ใส่ให้ครบ 6 หลัก" : ""; am.textContent = ""; }
+      });
+    });
+    if(!T){ res.innerHTML = `<p class="sim-sum">ใส่เลข 6 หลักและจำนวนใบ แล้วระบบจะคำนวณงบ โอกาส และเงินที่คาดว่าจะได้คืนให้ทันที</p>${ownNote()}`; return; }
+    const budget = T*ownPrice, {D,Pany,Pbe,P25,rows,N} = calcStats(mult,T,budget), expRet = T*BT.price*0.6;
+    res.innerHTML = `
+      <p class="sim-sum">รวม <b>${nf.format(T)}</b> ใบ ราคาใบละ ${nf.format(ownPrice)} บาท · เลขไม่ซ้ำกัน <b>${D}</b> เลข${bad?` · มี ${bad} ช่องที่ยังไม่ครบ 6 หลัก (ไม่นับ)`:""}</p>
+      <div class="sim-cards">
+        <div class="sc"><div class="t">งบที่ใช้</div><div class="n">${baht(budget)}</div><div class="s">บาท</div></div>
+        <div class="sc"><div class="t">โอกาสถูกอะไรสักอย่าง</div><div class="n">${(Pany*100).toFixed(1)}%</div><div class="s">ไม่ถูกเลย ${((1-Pany)*100).toFixed(1)}%</div></div>
+        <div class="sc"><div class="t">โอกาสคุ้มทุนหรือกำไร</div><div class="n">${(Pbe*100).toFixed(1)}%</div><div class="s">รางวัลรวม ≥ ${baht(budget)} บาท (จำลอง ${nf.format(N)} ครั้ง)</div></div>
+        <div class="sc"><div class="t">คาดว่าได้คืนเฉลี่ย</div><div class="n">${baht(expRet)}</div><div class="s">บาท · เสียเฉลี่ย ${baht(budget-expRet)} บาท</div></div>
+        <div class="sc"><div class="t">โอกาสถูกรางวัลที่ 2–5</div><div class="n">${(P25*100).toFixed(2)}%</div><div class="s">ทั้งชุดรวมกัน</div></div>
+      </div>
+      <div class="tw"><table class="mini"><thead><tr><th>ประเภทรางวัล</th><th>เงินรางวัลต่อใบ</th><th>โอกาสถูก (ทั้งชุด)</th><th>คาดได้คืน (บาท)</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${ownNote()}`;
+  }
+  function ownNote(){ return `<div class="sim-note">
+      <p><b>"ตรง n/6"</b> คือจำนวนหลักของเลขนี้ที่เป็นเลขเด่นอันดับ 1 ของรางวัลนั้น ส่วน <b>"สุ่ม"</b> คือค่าที่คาดถ้าเลือกเลขมั่ว ๆ (หลักละ 10% รวมประมาณ 0.6 จาก 6 หลัก) ใช้ดูว่าเลขของคุณ "เด่นกว่าสุ่ม" แค่ไหน</p>
+      <p><b>จำไว้:</b> คะแนนนี้ไม่เปลี่ยนโอกาสถูก เลข 6 หลักทุกเลขมีโอกาสเท่ากัน สิ่งที่เปลี่ยนโอกาสรวมจริงคือจำนวนเลขที่ไม่ซ้ำกัน และเลขหน้า 3 ตัว เลขท้าย 3 ตัว เลขท้าย 2 ตัวที่ซ้ำกัน เงินรางวัลทั้งระบบคืนผู้ซื้อราว 60% จึงคาดว่าขาดทุนโดยเฉลี่ย ซื้อเมื่อรับความเสี่ยงนี้ได้เท่านั้น</p></div>`; }
+  function updateOwn(){ if(!ownBuilt || !document.getElementById("own-res")) buildOwn(); else { document.getElementById("sim-sub").textContent = "ใส่เลขที่คิดจะซื้อเอง"; calcOwn(); } }
+  function update(){
+    const fwd = simMode==="fwd", mine = simMode==="own";
+    document.querySelectorAll("#sim .sim-ctl label[for=sim-k],#sim .stepper,#sim .sim-ctl .seg:last-child").forEach(e=>e.hidden = mine);
+    document.getElementById("sim-lead").textContent = mine
+      ? "พิมพ์เลข 6 หลักที่คิดจะซื้อในแต่ละรางวัล (กด + เพิ่ม เพื่อเพิ่มเลข) ใส่จำนวนใบและราคา แล้วดูงบ โอกาสถูก และเงินที่คาดว่าจะได้คืน"
+      : fwd
+      ? "ถ้าซื้อสลากรางวัลที่ 2, 3, 4 และ 5 อย่างละกี่ใบก็ตามที่เลือกสำหรับงวดที่จะถึง จะมีโอกาสถูกเท่าไร ต้องใช้งบเท่าไร และคาดว่าได้คืนเท่าไร"
+      : "ถ้าซื้อสลากรางวัลที่ 2, 3, 4 และ 5 อย่างละกี่ใบก็ตามที่เลือก ทุกงวดตั้งแต่อดีต แล้วตรวจกับผลที่ออกจริง จะได้หรือเสียเท่าไร";
+    if(!mine) ownBuilt = false;
+    if(simMode==="back") document.getElementById("sim-sub").textContent = `${nf.format(BT.draws)} งวด · ${thDate(BT.start)} ถึง ${thDate(BT.end)}`;
+    (mine?updateOwn:fwd?updateFwd:updateBack)();
+  }
   function setK(v){ k = Math.max(1, Math.min(10, Math.round(+v)||1)); kin.value = k; update(); }
   document.getElementById("sim-minus").onclick = ()=>setK(k-1);
   document.getElementById("sim-plus").onclick = ()=>setK(k+1);
   kin.addEventListener("change", ()=>setK(kin.value));
   kin.addEventListener("input", ()=>{ const v=+kin.value; if(v>=1&&v<=10&&Number.isInteger(v)){k=v;update();} });
+  [["back","sim-m-back"],["fwd","sim-m-fwd"],["own","sim-m-own"]].forEach(([m,id])=>{ document.getElementById(id).onclick = ()=>{
+    simMode=m; ["back","fwd","own"].forEach(x=>document.getElementById("sim-m-"+x).setAttribute("aria-pressed", x===m)); update(); }; });
   [["A","sim-A"],["B","sim-B"]].forEach(([s,id])=>{ document.getElementById(id).onclick = ()=>{
     strat=s; ["A","B"].forEach(x=>document.getElementById("sim-"+x).setAttribute("aria-pressed", x===s)); update(); }; });
   sec.hidden = false; update();
